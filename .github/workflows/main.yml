@@ -1,0 +1,23 @@
+name: CI for ML FastAPI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    [cite_start]runs-on: ubuntu-latest # [cite: 88]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest # Dodatkowo do uruchomienia testów
+      - name: Run unit tests
+        [cite_start]run: pytest test_main.py # [cite: 85]
