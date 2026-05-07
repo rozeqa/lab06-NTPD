@@ -1,27 +1,39 @@
-import pytest
+# test_model.py
 import numpy as np
-from main import model
+from model import train_and_predict, get_accuracy
 
 def test_predictions_not_none():
-    """Test 1: Sprawdza, czy otrzymujemy jakąkolwiek predykcję[cite: 61]."""
-    prediction = model.predict([[10.0]])
-    assert prediction is not None, "Predykcja nie powinna być None[cite: 64]."
+    """
+    Test 1: Sprawdza, czy otrzymujemy jakąkolwiek predykcję.
+    """
+    preds, _ = train_and_predict()
+    assert preds is not None, "Predictions should not be None."
 
 def test_predictions_length():
-    """Test 2: Sprawdza, czy długość listy predykcji odpowiada liczbie próbek[cite: 67]."""
-    input_data = [[1.0], [2.0], [3.0]]
-    preds = model.predict(input_data)
-    assert len(preds) == len(input_data), "Liczba predykcji musi być zgodna z liczbą próbek wejściowych."
+    """
+    Test 2: Sprawdza, czy długość listy predykcji jest większa od 0
+    i czy odpowiada przewidywanej liczbie próbek testowych.
+    """
+    preds, y_test = train_and_predict()
+    assert len(preds) > 0, "Predictions list should not be empty."
+    assert len(preds) == len(y_test), \
+        f"Expected {len(y_test)} predictions, got {len(preds)}."
 
 def test_predictions_value_range():
-    """Test 3: Sprawdza, czy wartości predykcji są sensowne dla regresji liniowej y=2x[cite: 72]."""
-    test_val = 5.0
-    prediction = model.predict([[test_val]])[0]
-    # Sprawdzamy czy wynik jest blisko spodziewanego 10.0 (z tolerancją błędu)
-    assert np.isclose(prediction, 10.0, atol=0.1), f"Błędna predykcja: {prediction} zamiast ~10.0"
+    """
+    Test 3: Sprawdza, czy wartości w predykcjach mieszczą się
+    w spodziewanym zakresie: dla zbioru Iris mamy 3 klasy (0, 1, 2).
+    """
+    preds, _ = train_and_predict()
+    valid_classes = {0, 1, 2}
+    for pred in preds:
+        assert pred in valid_classes, \
+            f"Prediction {pred} is outside expected range [0, 1, 2]."
 
 def test_model_accuracy():
-    """Test 4: Sprawdza, czy współczynnik modelu jest poprawny (zamiast accuracy dla regresji)[cite: 77]."""
-    # W Twoim modelu y=2x, więc współczynnik (coef) powinien wynosić 2
-    coef = model.coef_[0]
-    assert np.isclose(coef, 2.0), f"Model nie nauczył się poprawnie trendu. Coef: {coef}"
+    """
+    Test 4: Sprawdza, czy model osiąga co najmniej 70% dokładności.
+    """
+    accuracy = get_accuracy()
+    assert accuracy >= 0.70, \
+        f"Model accuracy {accuracy:.2%} is below the 70% threshold."
